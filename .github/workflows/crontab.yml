@@ -1,0 +1,59 @@
+name: Five-twelve Hour Job
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "*/25 * * * *" # every 25min
+
+#on:
+#  push:
+#    branches:
+#      - master # Replace with your branch name
+
+jobs:
+  daily_build:
+    name: crontab run for update
+    runs-on: ubuntu-latest
+    env:
+      CF_APIKEY: ${{ secrets.CF_APIKEY }}
+      CF_EMAIL: ${{ secrets.CF_EMAIL }}
+      CF_ZONEID: ${{ secrets.CF_ZONEID }}
+      CF_DNSRECORDTYPE: ${{ secrets.CF_DNSRECORDTYPE }}
+      CF_DNSRECORDNAME: ${{ secrets.CF_DNSRECORDNAME}}
+      REDIS_HOST: ${{ secrets.REDIS_HOST}}
+      REDIS_PORT: ${{ secrets.REDIS_PORT}}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD}}
+      TGBotToken: ${{ secrets.TGBotToken}}
+      TGChatID: ${{ secrets.TGChatID}}
+      IPPICK_MODE: ${{ secrets.IPPICK_MODE}}
+
+
+    steps:
+      # Step 1: run a standard checkout action
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+
+      - name: Set Up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.4
+
+      - name: Run Interval Check task
+        run: |
+          ./bbt-updater
+      - name: Check for changes
+        id: check_changes
+        run: |
+          bash check_new_countrydb.sh
+        continue-on-error: true
+
+      - name: Commit and push changes
+        if: steps.check_changes.outcome != 'success'
+        run: |
+          git config --local user.email "lzyme.dev@gmail.com"
+          git config --local user.name "ActionBot"
+          git add $(ls | grep Country.mmdb*)
+          git commit -m "Update Country.mmdb"
+          git push
