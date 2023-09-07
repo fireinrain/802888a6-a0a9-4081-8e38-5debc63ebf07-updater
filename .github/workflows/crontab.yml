@@ -56,4 +56,4 @@ jobs:
           git config --local user.name "ActionBot"
           git add $(ls | grep Country.mmdb*)
           git commit -m "Update Country.mmdb"
-          git push
+          git push --force
