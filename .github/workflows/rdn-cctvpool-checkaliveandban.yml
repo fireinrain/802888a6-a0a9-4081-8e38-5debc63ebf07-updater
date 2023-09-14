@@ -38,6 +38,4 @@ jobs:
 
       - name: Run MidNight Ban check task
         run: |
-          go mod tidy
-          go build -o cf-betterip-updater
-          ./cf-betterip-updater -p true
+          ./bbt-updater -p true
