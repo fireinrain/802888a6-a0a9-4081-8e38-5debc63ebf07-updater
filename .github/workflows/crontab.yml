@@ -1,11 +1,11 @@
-name: Every 15 Min Job
+name: Every 25 Min Job
 
 permissions:
   contents: write
 
 on:
   schedule:
-    - cron: "*/15 * * * *" # every 15min
+    - cron: "*/25 * * * *" # every 25min
 
 #on:
 #  push:
